@@ -35,8 +35,10 @@ export type WorkoutDay = {
 const exerciseVideoPaths: Partial<Record<`${Exclude<WorkoutSlug, "rest">}/${string}`, string>> = {
   "push/butterfly-machine": "/videos/workout/push/butterfly-machine.mp4",
   "push/flat-bench-press": "/videos/workout/push/flat-bench-press.mp4",
+  "push/incline-dumbbell-press": "/videos/workout/push/Incline Dumbbell Press.mp4",
   "push/seated-dumbbell-lateral-raises": "/videos/workout/push/seated-dumbbell-lateral-raises.mp4",
   "push/single-arm-triceps-pushdown": "/videos/workout/push/single-arm-triceps-pushdown.mp4",
+  "push/shoulder-press-machine": "/videos/workout/push/Shoulder Press Machine.mp4",
   "pull/lat-pulldown": "/videos/workout/pull/Wide grip lat pulldown.mp4",
   "pull/wide-grip-seated-row": "/videos/workout/pull/wide grip seated row.mp4",
   "pull/single-arm-dumbbell-row": "/videos/workout/pull/single arm dumbbell row.mp4",
