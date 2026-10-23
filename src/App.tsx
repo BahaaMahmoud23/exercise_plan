@@ -1,7 +1,12 @@
-import { useLayoutEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { WorkoutDayDetails } from "./components/WorkoutDayDetails";
 import { WorkoutOverviewCard } from "./components/WorkoutOverviewCard";
 import { workoutInstructions, workoutPlan, type Exercise } from "./data/workoutPlan";
+
+import { dateKey, dayNumber, weekDates, readSessions, saveSession, type Session } from "./data/tracking";
+import { WorkoutHistory } from "./components/WorkoutTracker";
+
+import { PwaControls } from "./components/PwaControls";
 
 type AppView = "overview" | "details";
 
@@ -16,8 +21,39 @@ function jumpToPageTop() {
 
 function App() {
   const [view, setView] = useState<AppView>("overview");
-  const [selectedDayNumber, setSelectedDayNumber] = useState(1);
+  const [selectedDayNumber, setSelectedDayNumber] = useState(dayNumber(dateKey()));
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+
+  const [today, setToday] = useState(dateKey);
+  const [weekAnchor, setWeekAnchor] = useState(dateKey);
+  const dates = weekDates(weekAnchor);
+  const [storageError, setStorageError] = useState("");
+  const [sessions, setSessions] = useState<Session[]>(() => {
+    try { return readSessions(window.localStorage); } catch { return []; }
+  });
+  useEffect(() => {
+    try { readSessions(window.localStorage); } catch { setStorageError("Saved workout data could not be read. Existing data is untouched; saving is blocked until storage is available."); }
+    const timer = window.setInterval(() => {
+      const now = dateKey();
+      if (now !== today) {
+        setWeekAnchor(anchor => weekDates(anchor).includes(today) ? now : anchor);
+        setToday(now);
+      }
+    }, 30000);
+    return () => window.clearInterval(timer);
+  }, [today]);
+  const onSave = (session: Session) => {
+    try { setSessions(saveSession(window.localStorage, session)); setStorageError(""); }
+    catch { setStorageError("Could not save workout. Existing saved data is untouched. Check browser storage and try again."); }
+  };
+  const completed = (day: typeof workoutPlan[number]) => sessions.some(s => s.id === `upper-lower-v1:${dates[day.day-1]}:${day.slug}` && s.completed);
+  const calendar = <><PwaControls /><section className="calendar-controls" aria-label="Workout week">
+    <label>Week containing <input aria-label="Week containing" type="date" value={weekAnchor} onChange={e => { if (/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) setWeekAnchor(e.target.value); }} /></label>
+    <button className="back-button" type="button" onClick={() => {setWeekAnchor(today);setSelectedDayNumber(dayNumber(today));setSelectedExercise(null);}}>Today</button>
+    <a href="#history" onClick={() => setView("overview")}>History</a>
+    <span>{dates[0]} – {dates[6]} · Saudi time</span>
+    {storageError && <p role="alert">{storageError}</p>}
+  </section></>;
 
   const selectedDay = useMemo(
     () => workoutPlan.find((day) => day.day === selectedDayNumber) ?? workoutPlan[0],
@@ -67,6 +103,7 @@ function App() {
   if (view === "details") {
     return (
       <main className="app-shell workout-page-shell">
+        {calendar}
         <nav className="workout-page-nav" aria-label="Workout day navigation">
           <button className="back-button" onClick={handleBackToPlan} type="button">
             Back to plan
@@ -79,13 +116,16 @@ function App() {
                 onClick={() => handleSelectDay(day.day)}
                 type="button"
               >
-                <span>D{day.day}</span>
+                <span>{day.weekday.slice(0,3)}{dates[day.day-1] === today ? " · Today" : ""}{completed(day) ? " ✓" : ""}</span>
                 {day.title}
               </button>
             ))}
           </div>
         </nav>
         <WorkoutDayDetails
+          date={dates[selectedDay.day-1]}
+          sessions={sessions}
+          onSave={onSave}
           day={selectedDay}
           selectedExercise={selectedExercise}
           onSelectExercise={setSelectedExercise}
@@ -96,12 +136,13 @@ function App() {
 
   return (
     <main className="app-shell">
+      {calendar}
       <section className="hero-section" aria-labelledby="page-title">
         <div className="hero-copy">
-          <span className="eyebrow">PPL X UL - 5 Days</span>
+          <span className="eyebrow">Upper / Lower - 4 Days</span>
           <h1 id="page-title">A focused 7-day training week built for clean progression.</h1>
           <p>
-            Push, Pull, Legs, Rest, Upper, Lower, Rest. Every session includes warm-up guidance,
+            Upper A, Lower A, Rest, Upper B, Lower B, Rest, Rest. Every session includes warm-up guidance,
             working-set targets, demo-ready media slots, and form notes.
           </p>
           <div className="hero-actions">
@@ -111,8 +152,8 @@ function App() {
         </div>
         <div className="hero-panel" aria-label="Weekly training summary">
           <span>Current split</span>
-          <strong>5 training days</strong>
-          <p>30 working exercises across the week with 2 recovery days.</p>
+          <strong>4 training days</strong>
+          <p>26 exercise slots across the week with 3 recovery days.</p>
           <div className="mini-week">
             {workoutPlan.map((day) => (
               <button
@@ -121,7 +162,7 @@ function App() {
                 onClick={() => handleSelectDay(day.day)}
                 type="button"
               >
-                <span>D{day.day}</span>
+                <span>{day.weekday.slice(0,3)}{dates[day.day-1] === today ? " · Today" : ""}{completed(day) ? " ✓" : ""}</span>
                 {day.title}
               </button>
             ))}
@@ -144,6 +185,8 @@ function App() {
       <section className="overview-section" id="plan" aria-label="Workout plan overview">
         {workoutPlan.map((day) => (
           <WorkoutOverviewCard
+            today={dates[day.day-1] === today}
+            completed={completed(day)}
             active={selectedDay.day === day.day}
             day={day}
             key={day.day}
@@ -152,7 +195,11 @@ function App() {
         ))}
       </section>
 
+      <WorkoutHistory sessions={sessions} />
       <WorkoutDayDetails
+        date={dates[selectedDay.day-1]}
+        sessions={sessions}
+        onSave={onSave}
         day={selectedDay}
         selectedExercise={selectedExercise}
         onSelectExercise={setSelectedExercise}

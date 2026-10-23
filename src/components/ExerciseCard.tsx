@@ -24,8 +24,8 @@ export function ExerciseCard({ exercise, active, index, onSelect }: ExerciseCard
             Sets
           </span>
           <span>
-            <b>{exercise.reps.join(" / ")}</b>
-            Reps
+            <b>{[...new Set(exercise.reps)].join(" / ")}</b>
+            {exercise.unit === "seconds" ? "Seconds" : "Reps"}
           </span>
         </div>
         <button type="button" onClick={onSelect}>

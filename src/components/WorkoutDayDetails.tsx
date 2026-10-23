@@ -5,13 +5,19 @@ import { RestDayCard } from "./RestDayCard";
 import { WarmupCard } from "./WarmupCard";
 import { CardioCard } from "./CardioCard";
 
+import { WorkoutTracker } from "./WorkoutTracker";
+import type { Session } from "../data/tracking";
+
 type WorkoutDayDetailsProps = {
   day: WorkoutDay;
+  date: string;
+  sessions: Session[];
+  onSave: (session: Session) => void;
   selectedExercise: Exercise | null;
   onSelectExercise: (exercise: Exercise) => void;
 };
 
-export function WorkoutDayDetails({ day, selectedExercise, onSelectExercise }: WorkoutDayDetailsProps) {
+export function WorkoutDayDetails({ day, date, sessions, onSave, selectedExercise, onSelectExercise }: WorkoutDayDetailsProps) {
   if (day.isRest) {
     return <RestDayCard day={day} />;
   }
@@ -28,7 +34,7 @@ export function WorkoutDayDetails({ day, selectedExercise, onSelectExercise }: W
     <section className="workout-detail-shell" aria-labelledby="workout-title">
       <div className="workout-heading">
         <div>
-          <span className="section-kicker">Day {day.day} of 7</span>
+          <span className="section-kicker">{day.weekday} · {date}</span>
           <h2 id="workout-title">{day.title} Workout</h2>
           <p>{day.description}</p>
         </div>
@@ -49,7 +55,8 @@ export function WorkoutDayDetails({ day, selectedExercise, onSelectExercise }: W
         </div>
         <ExerciseDetails exercise={activeExercise} />
       </div>
-      <CardioCard />
+      <WorkoutTracker day={day} date={date} sessions={sessions} onSave={onSave} />
+      <CardioCard recommendation={day.cardio} />
     </section>
   );
 }

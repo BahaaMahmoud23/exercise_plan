@@ -8,8 +8,9 @@ export function RestDayCard({ day }: RestDayCardProps) {
   return (
     <section className="rest-panel" aria-labelledby="rest-title">
       <span className="section-kicker">Recovery</span>
-      <h2 id="rest-title">Day {day.day}: {day.title}</h2>
+      <h2 id="rest-title">{day.weekday}: {day.title}</h2>
       <p>{day.description}</p>
+      {day.cardio && <p>{day.cardio}</p>}
       <div className="recovery-grid">
         <div>
           <strong>Sleep</strong>

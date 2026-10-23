@@ -1,4 +1,6 @@
-export type WorkoutSlug = "push" | "pull" | "legs" | "upper" | "lower" | "rest";
+type MediaSection = "push" | "pull" | "legs" | "upper" | "lower" | "rest";
+
+export type WorkoutSlug = "upper-a" | "lower-a" | "upper-b" | "lower-b" | "rest";
 
 export type Warmup = {
   title: string;
@@ -7,6 +9,7 @@ export type Warmup = {
 };
 
 export type Exercise = {
+  unit?: "reps" | "seconds";
   name: string;
   slug: string;
   sets: number;
@@ -23,6 +26,8 @@ export type Exercise = {
 
 export type WorkoutDay = {
   day: number;
+  weekday: string;
+  cardio?: string;
   title: string;
   slug: WorkoutSlug;
   description: string;
@@ -32,7 +37,7 @@ export type WorkoutDay = {
   isRest?: boolean;
 };
 
-const exerciseVideoPaths: Partial<Record<`${Exclude<WorkoutSlug, "rest">}/${string}`, string>> = {
+const exerciseVideoPaths: Partial<Record<`${Exclude<MediaSection, "rest">}/${string}`, string>> = {
   "push/butterfly-machine": "/videos/workout/push/butterfly-machine.mp4",
   "push/flat-bench-press": "/videos/workout/push/flat-bench-press.mp4",
   "push/incline-dumbbell-press": "/videos/workout/push/Incline Dumbbell Press.mp4",
@@ -65,7 +70,7 @@ const exerciseVideoPaths: Partial<Record<`${Exclude<WorkoutSlug, "rest">}/${stri
   "lower/seated-calf-raises-machine": "/videos/workout/lower/Seated calf raises ( Old vid ).mp4",
 };
 
-const mediaPath = (section: Exclude<WorkoutSlug, "rest">, slug: string) => ({
+const mediaPath = (section: Exclude<MediaSection, "rest">, slug: string) => ({
   image: `/images/workout/${section}/${slug}.jpg`,
   video: exerciseVideoPaths[`${section}/${slug}`] ?? `/videos/workout/${section}/${slug}.mp4`,
 });
@@ -93,7 +98,7 @@ const lowerBodyWarmup: Warmup = {
 };
 
 const createExercise = (
-  section: Exclude<WorkoutSlug, "rest">,
+  section: Exclude<MediaSection, "rest">,
   name: string,
   slug: string,
   sets: number,
@@ -128,151 +133,87 @@ const createExercise = (
   ],
 });
 
-export const workoutPlan: WorkoutDay[] = [
-  {
-    day: 1,
-    title: "Push",
-    slug: "push",
-    description: "Chest, shoulders, and triceps with controlled pressing volume.",
-    targetMuscles: ["Chest", "Shoulders", "Triceps"],
-    warmup: upperBodyWarmup,
-    exercises: [
-      createExercise(
-        "push",
-        "Butterfly Machine",
-        "butterfly-machine",
-        2,
-        ["12-10", "12-10"],
-        "Chest",
-        "Do not go too heavy. Make sure your form is perfect.",
-      ),
-      createExercise("push", "Flat Bench Press", "flat-bench-press", 2, ["8-10", "8-10"], "Chest"),
-      createExercise("push", "Incline Dumbbell Press", "incline-dumbbell-press", 2, ["8-10", "8-10"], "Upper Chest"),
-      createExercise(
-        "push",
-        "Seated Dumbbell Lateral Raises",
-        "seated-dumbbell-lateral-raises",
-        4,
-        ["12-10", "12-10", "12-10", "12-10"],
-        "Side Delts",
-      ),
-      createExercise("push", "Single Arm Triceps Pushdown", "single-arm-triceps-pushdown", 2, ["12-10", "12-10"], "Triceps"),
-      createExercise("push", "Shoulder Press Machine", "shoulder-press-machine", 1, ["6-8"], "Shoulders"),
-    ],
-  },
-  {
-    day: 2,
-    title: "Pull",
-    slug: "pull",
-    description: "Back width, rowing strength, rear delts, and biceps.",
-    targetMuscles: ["Back", "Rear Delts", "Biceps"],
-    warmup: upperBodyWarmup,
-    exercises: [
-      createExercise("pull", "Lat Pulldown", "lat-pulldown", 2, ["8-10", "8-10"], "Lats"),
-      createExercise("pull", "Wide Grip Seated Row", "wide-grip-seated-row", 2, ["12-10", "12-10"], "Mid Back"),
-      createExercise("pull", "Single Arm Dumbbell Row", "single-arm-dumbbell-row", 2, ["12-10", "12-10"], "Lats"),
-      createExercise("pull", "Reverse Flyes Machine", "reverse-flyes-machine", 2, ["8-10", "8-10"], "Rear Delts"),
-      createExercise("pull", "Seated Dumbbell Curls", "seated-dumbbell-curls", 2, ["12-10", "12-10"], "Biceps"),
-      createExercise("pull", "Dumbbell Preacher Curl", "dumbbell-preacher-curl", 1, ["12-10"], "Biceps"),
-    ],
-  },
-  {
-    day: 3,
-    title: "Legs",
-    slug: "legs",
-    description: "Quad, hamstring, glute, adductor, and calf work.",
-    targetMuscles: ["Quads", "Hamstrings", "Glutes", "Calves"],
-    warmup: lowerBodyWarmup,
-    exercises: [
-      createExercise("legs", "Hack Squats", "hack-squats", 2, ["8-10", "8-10"], "Quads"),
-      createExercise("legs", "Lying or Seated Leg Curls", "lying-or-seated-leg-curls", 3, ["12-10", "12-10", "12-10"], "Hamstrings"),
-      createExercise("legs", "Leg Extensions", "leg-extensions", 2, ["12-10", "12-10"], "Quads"),
-      createExercise("legs", "Smith Machine Hip Thrust", "smith-machine-hip-thrust", 2, ["12-10", "12-10"], "Glutes"),
-      createExercise("legs", "Hip Adduction Machine", "hip-adduction-machine", 3, ["12-10", "12-10", "12-10"], "Adductors"),
-      createExercise(
-        "legs",
-        "Seated Calf Raises Machine",
-        "seated-calf-raises-machine",
-        4,
-        ["12-10", "12-10", "12-10", "12-10"],
-        "Calves",
-      ),
-    ],
-  },
-  {
-    day: 4,
-    title: "Rest",
-    slug: "rest",
-    description: "Recovery day for sleep, steps, food quality, and easy mobility.",
-    targetMuscles: ["Recovery", "Mobility"],
-    exercises: [],
-    isRest: true,
-  },
-  {
-    day: 5,
-    title: "Upper",
-    slug: "upper",
-    description: "Balanced upper body session with chest, back, delts, and arms.",
-    targetMuscles: ["Chest", "Back", "Shoulders", "Arms"],
-    warmup: upperBodyWarmup,
-    exercises: [
-      createExercise("upper", "Butterfly Machine", "butterfly-machine", 2, ["12-10", "12-10"], "Chest"),
-      createExercise("upper", "Lat Pulldown", "lat-pulldown", 2, ["8-10", "8-10"], "Lats"),
-      createExercise("upper", "Cable Lateral Raises", "cable-lateral-raises", 3, ["12-10", "12-10", "12-10"], "Side Delts"),
-      createExercise("upper", "Wide Grip Seated Row", "wide-grip-seated-row", 2, ["8-10", "8-10"], "Mid Back"),
-      createExercise(
-        "upper",
-        "Single Arm Triceps Pushdown",
-        "single-arm-triceps-pushdown",
-        3,
-        ["12-10", "12-10", "12-10"],
-        "Triceps",
-      ),
-      createExercise("upper", "Seated Dumbbell Curls", "seated-dumbbell-curls", 2, ["12-10", "12-10"], "Biceps"),
-    ],
-  },
-  {
-    day: 6,
-    title: "Lower",
-    slug: "lower",
-    description: "Leg press-led lower day with posterior chain and calves.",
-    targetMuscles: ["Quads", "Hamstrings", "Glutes", "Calves"],
-    warmup: lowerBodyWarmup,
-    exercises: [
-      createExercise("lower", "Leg Press", "leg-press", 2, ["8-10", "8-10"], "Quads"),
-      createExercise("lower", "Lying or Seated Leg Curls", "lying-or-seated-leg-curls", 3, ["12-10", "12-10", "12-10"], "Hamstrings"),
-      createExercise("lower", "Leg Extension", "leg-extension", 2, ["12-10", "12-10"], "Quads"),
-      createExercise("lower", "Smith Machine Hip Thrust", "smith-machine-hip-thrust", 2, ["15-10", "15-10"], "Glutes"),
-      createExercise("lower", "Hip Adduction Machine", "hip-adduction-machine", 2, ["12-10", "12-10"], "Adductors"),
-      createExercise("lower", "Seated Calf Raises Machine", "seated-calf-raises-machine", 3, ["12-10", "12-10", "12-10"], "Calves"),
-    ],
-  },
-  {
-    day: 7,
-    title: "Rest",
-    slug: "rest",
-    description: "Full recovery day. Keep movement easy and prepare for the next week.",
-    targetMuscles: ["Recovery", "Readiness"],
-    exercises: [],
-    isRest: true,
-  },
-];
-
-export const workoutInstructions = [
-  "Warm up well before every exercise with a 50% weight set before working sets.",
-  "Get close to muscle failure while keeping 1-2 reps in reserve.",
-  "Rest 3-6 minutes between every set for best performance.",
-  "If this is your first time or you have not trained for a long time, use 2 warm-up sets: 50% then 75-80% of working weight.",
-  "Use Figure 8 straps or old school lifting straps for back work so forearms do not reach failure before your back.",
-  "Do not move your shoulders or swing your elbows during triceps or biceps movements.",
-  "Do cardio after the workout for at least 20 minutes. Use 30-40 minutes when progress calls for it.",
-];
-
-export const cardioGuidance = {
-  title: "Post-workout Cardio",
-  duration: "20 minutes minimum, 30-40 minutes depending on progress",
-  incline: 8,
-  speed: 4,
-  equipment: ["Treadmill", "Cardio bike"],
-  video: "/videos/workout/cardio/treadmill-incline-walk.mp4",
+const addedExerciseVideos: Record<string, string> = {
+  "chest-press": "/videos/workout/" + encodeURIComponent("Chest Press.mp4"),
+  "romanian-deadlift": "/videos/workout/" + encodeURIComponent("Romanian Deadlift.mp4"),
+  "cable-crunch": "/videos/workout/" + encodeURIComponent("Cable Crunch.mp4"),
+  "seated-leg-curl": "/videos/workout/" + encodeURIComponent("Seated Leg Curl.mp4"),
+  "overhead-triceps-extension": "/videos/workout/" + encodeURIComponent("Overhead Triceps Extension.mp4"),
+  "hammer-curl": "/videos/workout/" + encodeURIComponent("Hammer Curl.mp4"),
+  "chest-supported-row": "/videos/workout/" + encodeURIComponent("Chest Supported Row.mp4"),
+  "lat-pulldown-alternative-grip": "/videos/workout/" + encodeURIComponent("Lat Pulldown (Alternative Grip).mp4"),
+  "plank": "/videos/workout/" + encodeURIComponent("Plank.mp4"),
 };
+
+// Stable exercise slugs are reused across sessions; session records snapshot their targets.
+const exercise = (name: string, slug: string, sets: number, range: string, muscle: string,
+  media?: [Exclude<MediaSection, "rest">, string], unit: "reps" | "seconds" = "reps"): Exercise => ({
+  ...createExercise(media?.[0] ?? "upper", name, media?.[1] ?? slug, sets, Array(sets).fill(range), muscle),
+  slug, unit,
+  // Only use existing demos that match the exercise, never a different movement.
+  image: media ? mediaPath(...media).image : "",
+  video: addedExerciseVideos[slug] ?? (media ? mediaPath(...media).video : ""),
+});
+
+const upperA = [
+  exercise("Chest Press", "chest-press", 3, "8–12", "Chest"),
+  exercise("Lat Pulldown", "lat-pulldown", 3, "8–12", "Lats", ["pull", "lat-pulldown"]),
+  exercise("Seated Cable Row", "seated-cable-row", 2, "10–12", "Mid Back", ["pull", "wide-grip-seated-row"]),
+  exercise("Shoulder Press", "shoulder-press", 2, "10–12", "Shoulders", ["push", "shoulder-press-machine"]),
+  exercise("Lateral Raise", "lateral-raise", 2, "12–15", "Side Delts", ["push", "seated-dumbbell-lateral-raises"]),
+  exercise("Triceps Pushdown", "triceps-pushdown", 2, "10–15", "Triceps", ["push", "single-arm-triceps-pushdown"]),
+  exercise("Biceps Curl", "biceps-curl", 2, "10–15", "Biceps", ["pull", "seated-dumbbell-curls"]),
+];
+const lowerA = [
+  exercise("Leg Press", "leg-press", 3, "10–12", "Quads", ["lower", "leg-press"]),
+  exercise("Romanian Deadlift", "romanian-deadlift", 2, "8–10", "Hamstrings"),
+  exercise("Leg Curl", "leg-curl", 3, "10–12", "Hamstrings", ["legs", "lying-or-seated-leg-curls"]),
+  exercise("Leg Extension", "leg-extension", 2, "12–15", "Quads", ["lower", "leg-extension"]),
+  exercise("Calf Raises", "calf-raises", 3, "12–15", "Calves", ["lower", "seated-calf-raises-machine"]),
+  exercise("Plank", "plank", 3, "20–40", "Core", undefined, "seconds"),
+];
+const upperB = [
+  exercise("Incline Chest Press", "incline-chest-press", 3, "8–12", "Upper Chest", ["push", "incline-dumbbell-press"]),
+  exercise("Lat Pulldown (Alternative Grip)", "lat-pulldown-alternative-grip", 3, "10–12", "Lats"),
+  exercise("Chest Supported Row", "chest-supported-row", 2, "10–12", "Mid Back"),
+  exercise("Pec Deck", "pec-deck", 2, "12–15", "Chest", ["push", "butterfly-machine"]),
+  exercise("Reverse Pec Deck", "reverse-pec-deck", 2, "12–15", "Rear Delts", ["pull", "reverse-flyes-machine"]),
+  exercise("Hammer Curl", "hammer-curl", 2, "10–12", "Biceps"),
+  exercise("Overhead Triceps Extension", "overhead-triceps-extension", 2, "10–12", "Triceps"),
+];
+const lowerB = [
+  exercise("Squat / Hack Squat", "squat-hack-squat", 3, "8–12", "Quads", ["legs", "hack-squats"]),
+  exercise("Hip Thrust", "hip-thrust", 3, "10–12", "Glutes", ["lower", "smith-machine-hip-thrust"]),
+  exercise("Seated Leg Curl", "seated-leg-curl", 3, "10–12", "Hamstrings"),
+  exercise("Leg Extension", "leg-extension", 2, "12–15", "Quads", ["lower", "leg-extension"]),
+  exercise("Calf Raises", "calf-raises", 3, "12–15", "Calves", ["lower", "seated-calf-raises-machine"]),
+  exercise("Cable Crunch", "cable-crunch", 3, "12–15", "Core"),
+];
+const trainingDay = (day: number, weekday: string, title: string, slug: WorkoutSlug, exercises: Exercise[], upper: boolean): WorkoutDay => ({
+  day, weekday, title, slug, exercises,
+  description: upper ? "Balanced upper body training with chest, back, shoulders, and arms." : "Lower body training with quads, hamstrings, glutes, calves, and core.",
+  targetMuscles: upper ? ["Chest", "Back", "Shoulders", "Arms"] : ["Quads", "Hamstrings", "Glutes", "Core"],
+  warmup: upper ? upperBodyWarmup : lowerBodyWarmup,
+  cardio: "Optional: 10 minutes of brisk walking after resistance training.",
+});
+const restDay = (day: number, weekday: string, walking = false): WorkoutDay => ({
+  day, weekday, title: "Rest", slug: "rest", exercises: [], isRest: true,
+  description: "Recovery day for sleep, hydration, and easy mobility.",
+  targetMuscles: ["Recovery", "Mobility"],
+  cardio: walking ? "Optional: 15–20 minutes of walking." : undefined,
+});
+export const workoutPlan: WorkoutDay[] = [
+  trainingDay(1, "Saturday", "Upper A", "upper-a", upperA, true),
+  trainingDay(2, "Sunday", "Lower A", "lower-a", lowerA, false),
+  restDay(3, "Monday", true),
+  trainingDay(4, "Tuesday", "Upper B", "upper-b", upperB, true),
+  trainingDay(5, "Wednesday", "Lower B", "lower-b", lowerB, false),
+  restDay(6, "Thursday", true),
+  restDay(7, "Friday"),
+];
+export const workoutInstructions = [
+  "Warm up before working sets and keep every repetition controlled.",
+  "Keep 1-2 reps in reserve and earn heavier loads with consistent form.",
+  "Log each working set in kilograms; track plank holds in seconds.",
+  "Walking is optional: 10 minutes after training, and 15–20 minutes on Monday and Thursday.",
+];

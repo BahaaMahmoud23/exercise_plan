@@ -14,7 +14,7 @@ export function ExerciseDetails({ exercise }: ExerciseDetailsProps) {
         <h2 id="exercise-detail-title">{exercise.name}</h2>
         <div className="detail-stat-row">
           <span>{exercise.sets} sets</span>
-          <span>{exercise.reps.join(" / ")} reps</span>
+          <span>{[...new Set(exercise.reps)].join(" / ")} {exercise.unit ?? "reps"}</span>
           <span>{exercise.restTime}</span>
         </div>
         <DetailList title="How to perform" items={exercise.instructions} />

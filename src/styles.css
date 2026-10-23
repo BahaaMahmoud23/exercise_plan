@@ -757,3 +757,33 @@ p {
     width: 100%;
   }
 }
+
+.calendar-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; padding: 16px 0; }
+.calendar-controls a { color: var(--accent-2); }
+.calendar-controls span { color: var(--muted); }
+.tracking-panel { margin: 24px 0; padding: clamp(14px, 3vw, 28px); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.exercise-log { border-top: 1px solid var(--line); padding: 20px 0; }
+.set-row { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) 44px; align-items: center; gap: 8px; margin: 8px 0; }
+.set-header { font-size: .85rem; color: var(--muted); }
+.set-row input, textarea, input[type="date"] { min-width: 0; width: 100%; padding: 10px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: var(--radius); font: inherit; }
+.set-row input[type="checkbox"] { width: 24px; height: 24px; accent-color: var(--accent); }
+textarea { display: block; margin-top: 8px; min-height: 64px; resize: vertical; }
+.calendar-controls input[type="date"] { width: auto; }
+.is-completed { border-color: var(--accent-2); background: var(--surface-2); }
+.overview-card.is-today { outline: 2px solid var(--accent-2); outline-offset: -4px; }
+.tracking-panel details { padding: 14px 0; border-top: 1px solid var(--line); }
+.tracking-panel summary { cursor: pointer; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); }
+@media (max-width: 520px) { .set-row { font-size: .8rem; gap: 5px; } .set-row input { padding: 10px 5px; } }
+
+/* Instructional media: preserve the full frame, including portrait demonstrations. */
+.media-frame { background: #141414; min-height: 170px; max-height: min(60svh, 560px); }
+.media-frame video { object-fit: contain; object-position: center; }
+.video-idle, .video-message { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 18px; gap: 12px; text-align: center; }
+.video-message { background: #141414; flex-direction: column; padding-top: 54px; }
+.video-close { position: absolute; top: 8px; right: 8px; z-index: 2; min-height: 44px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--text); padding: 8px 12px; }
+.set-row input[type="checkbox"] { width: 44px; height: 44px; }
+.pwa-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 8px 0; color: var(--muted); }
+.pwa-controls p { margin: 0; }
+@media (display-mode: standalone) { .app-shell { padding-bottom: max(32px, env(safe-area-inset-bottom)); } }
