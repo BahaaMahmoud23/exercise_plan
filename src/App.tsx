@@ -7,8 +7,9 @@ import { dateKey, dayNumber, weekDates, readSessions, saveSession, type Session 
 import { WorkoutHistory } from "./components/WorkoutTracker";
 
 import { PwaControls } from "./components/PwaControls";
+import { CalorieTracker } from "./components/CalorieTracker";
 
-type AppView = "overview" | "details";
+type AppView = "overview" | "details" | "calories";
 
 function jumpToPageTop() {
   const root = document.documentElement;
@@ -48,6 +49,7 @@ function App() {
   };
   const completed = (day: typeof workoutPlan[number]) => sessions.some(s => s.id === `upper-lower-v1:${dates[day.day-1]}:${day.slug}` && s.completed);
   const calendar = <><PwaControls /><section className="calendar-controls" aria-label="Workout week">
+    <button className="back-button" type="button" onClick={() => setView("calories")}>حساب السعرات | Calorie Tracker</button>
     <label>Week containing <input aria-label="Week containing" type="date" value={weekAnchor} onChange={e => { if (/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) setWeekAnchor(e.target.value); }} /></label>
     <button className="back-button" type="button" onClick={() => {setWeekAnchor(today);setSelectedDayNumber(dayNumber(today));setSelectedExercise(null);}}>Today</button>
     <a href="#history" onClick={() => setView("overview")}>History</a>
@@ -99,6 +101,8 @@ function App() {
       document.getElementById("plan")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 0);
   };
+
+  if (view === "calories") return <CalorieTracker onBack={() => setView("overview")} />;
 
   if (view === "details") {
     return (

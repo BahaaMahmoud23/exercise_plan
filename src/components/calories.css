@@ -1,0 +1,32 @@
+.calorie-tracker { display:grid; gap:20px; }
+.calorie-tracker h1 { font-size:clamp(2rem,6vw,4rem); line-height:1.3; max-width:none; margin:12px 0; }
+.calorie-tracker h2 { font-size:1.4rem; line-height:1.5; }
+.calorie-tracker p { line-height:1.8; color:var(--muted); margin-bottom:10px; }
+.calorie-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:12px; }
+.calorie-toolbar span { color:var(--muted); }
+.calorie-panel { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:20px; min-width:0; }
+.calorie-stats { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; }
+.calorie-stats strong { display:block; font-size:1.5rem; margin-top:14px; overflow-wrap:anywhere; }
+.calorie-week { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px; }
+.calorie-week button { color:var(--text); display:grid; gap:10px; padding:14px 8px; text-align:center; }
+.calorie-week span,.calorie-week small { font-size:.8rem; }
+.calorie-week .is-selected { border-color:var(--accent); outline:2px solid var(--accent); }
+.calorie-tracker progress { width:100%; accent-color:var(--accent); }
+.calorie-chart { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px; }
+.calorie-chart>div { display:grid; text-align:center; gap:8px; font-size:.8rem; }
+.calorie-bar-track { height:140px; display:flex; align-items:end; background:var(--surface-2); }
+.calorie-bar { width:100%; background:var(--accent-2); }
+.calorie-bar.closed { background:var(--accent); }
+.calorie-form { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:20px; }
+.calorie-tracker label { display:grid; gap:8px; }
+.calorie-tracker input,.calorie-tracker select,.calorie-tracker textarea { font:inherit; color:var(--text); background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius); padding:12px; min-width:0; width:100%; }
+.calorie-tracker input[type=checkbox] { width:auto; }
+.calorie-tracker :is(input,select,textarea):focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.calorie-wide { grid-column:1/-1; }
+.calorie-entries { list-style:none; padding:0; margin-bottom:0; }
+.calorie-entries li { display:flex; justify-content:space-between; gap:16px; padding:18px 0; border-top:1px solid var(--line); overflow-wrap:anywhere; }
+.calorie-tracker .calorie-error { color:var(--accent-2); }
+.calorie-tracker button:disabled { opacity:.5; cursor:not-allowed; }
+.calorie-tracker summary { cursor:pointer; padding:8px; }
+@media(max-width:900px) { .calorie-stats { grid-template-columns:repeat(2,minmax(0,1fr)); } .calorie-week { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+@media(max-width:560px) { .calorie-form { grid-template-columns:1fr; } .calorie-week { grid-template-columns:repeat(2,minmax(0,1fr)); } .calorie-entries li { flex-direction:column; } .calorie-panel { padding:14px; } .calorie-chart { gap:4px; } .calorie-chart>div { font-size:.65rem; } }

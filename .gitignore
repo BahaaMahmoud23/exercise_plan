@@ -19,3 +19,5 @@ screenshots-*.png
 pdf-contact-sheet.png
 pdf-pages/
 debug.log
+.vercel
+.env*
