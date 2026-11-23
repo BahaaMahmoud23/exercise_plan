@@ -1,6 +1,7 @@
 import type { WorkoutDay } from "./workoutPlan";
 
 export const STORAGE_KEY = "bahaa-workouts.upper-lower.v1";
+const PROGRAM_ID = "hybrid-gym-calisthenics-v1";
 export type SetLog = { target: string; actual: string; weight: string; completed: boolean };
 export type ExerciseLog = { slug: string; name: string; unit: "reps" | "seconds"; sets: SetLog[]; notes: string };
 export type Session = { id: string; program: string; date: string; title: string; completed: boolean; exercises: ExerciseLog[] };
@@ -19,8 +20,11 @@ export function weekDates(date: string): string[] {
     return next.toISOString().slice(0, 10);
   });
 }
+export function sessionId(day: WorkoutDay, date: string): string {
+  return `${PROGRAM_ID}:${date}:${day.slug}`;
+}
 export function createSession(day: WorkoutDay, date: string): Session {
-  return { id: `upper-lower-v1:${date}:${day.slug}`, program: "upper-lower-v1", date, title: day.title, completed: false,
+  return { id: sessionId(day, date), program: PROGRAM_ID, date, title: day.title, completed: false,
     exercises: day.exercises.map(e => ({ slug: e.slug, name: e.name, unit: e.unit ?? "reps", notes: "",
       sets: e.reps.map(target => ({ target, actual: "", weight: "", completed: false })) })) };
 }

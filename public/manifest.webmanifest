@@ -2,7 +2,7 @@
   "id": "/",
   "name": "Bahaa Workout Tracker",
   "short_name": "Workouts",
-  "description": "Upper/Lower workout schedule, set logging and workout history",
+  "description": "Hybrid gym and calisthenics schedule, set logging and workout history",
   "lang": "en",
   "start_url": "/",
   "scope": "/",

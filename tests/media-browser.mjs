@@ -16,7 +16,7 @@ try {
  });
  await page.goto('http://127.0.0.1:5173');
  assert.equal(videos.length,0,'initial page must not request any video');
- const demos=[['Upper A','Chest Press'],['Lower A','Romanian Deadlift'],['Lower B','Cable Crunch'],['Lower B','Seated Leg Curl'],['Upper B','Overhead Triceps Extension'],['Upper B','Hammer Curl'],['Upper B','Chest Supported Row'],['Upper B','Lat Pulldown (Alternative Grip)'],['Lower A','Plank']];
+ const demos=[['Upper A','Incline Dumbbell Press'],['Lower + Core','Romanian Deadlift'],['Arms + Calisthenics Skills','Overhead Triceps Extension'],['Upper B','Hammer Curl'],['Upper B','Chest Supported Row'],['Upper B','Chest Press Machine'],['Lower + Core','Plank']];
  for(const [day,name] of demos){
   await page.locator('.overview-card').filter({has:page.locator('strong',{hasText:day})}).click();
   await page.locator('.exercise-card').filter({has:page.getByRole('heading',{name,exact:true})}).getByRole('button').click();
@@ -33,6 +33,23 @@ try {
   await page.getByRole('button',{name:'Close video',exact:true}).click();assert.equal(await video.count(),0);
   console.log(`PASS playback mobile/desktop: ${name} (${info.width}x${info.height})`);
   await page.setViewportSize({width:390,height:844});
+  await page.getByRole('button',{name:'Back to plan',exact:true}).click();
+ }
+ const linkedDemos = [
+  ['Upper A','Incline Push-ups'],
+  ['Lower + Core','Dead Bug'],
+  ['Upper B','Assisted Pull-ups'],
+  ['Arms + Calisthenics Skills','Incline Pike Push-ups'],
+  ['Arms + Calisthenics Skills','Hollow Body Hold'],
+ ];
+ for (const [day,name] of linkedDemos) {
+  await page.locator('.overview-card').filter({has:page.locator('strong',{hasText:day})}).click();
+  await page.locator('.exercise-card').filter({has:page.getByRole('heading',{name,exact:true})}).getByRole('button').click();
+  const link = page.getByRole('link',{name:`Watch ${name} video`,exact:true});
+  const url = new URL(await link.getAttribute('href'));
+  assert.equal(url.origin,'https://www.youtube.com');
+  const poster = await link.locator('xpath=../..').evaluate(frame=>getComputedStyle(frame).backgroundImage);
+  assert.equal(poster,`url("https://i.ytimg.com/vi/${url.searchParams.get('v')}/hqdefault.jpg")`);
   await page.getByRole('button',{name:'Back to plan',exact:true}).click();
  }
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);

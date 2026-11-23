@@ -8,7 +8,7 @@ type ExerciseDetailsProps = {
 export function ExerciseDetails({ exercise }: ExerciseDetailsProps) {
   return (
     <aside className="exercise-details" aria-labelledby="exercise-detail-title">
-      <MediaFrame src={exercise.video} poster={exercise.image} title={exercise.name} />
+      <MediaFrame src={exercise.video} poster={exercise.image} demoUrl={exercise.demoUrl} title={exercise.name} />
       <div className="detail-content">
         <span className="section-kicker">{exercise.targetMuscle}</span>
         <h2 id="exercise-detail-title">{exercise.name}</h2>

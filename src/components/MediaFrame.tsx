@@ -1,8 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 
-type MediaFrameProps = { src: string; poster?: string; title: string; className?: string };
+type MediaFrameProps = { src: string; poster?: string; demoUrl?: string; title: string; className?: string };
 
 export function MediaFrame(props: MediaFrameProps) {
+  if (props.demoUrl) {
+    return <div className="media-frame" aria-label={`${props.title} media`}
+      style={{ backgroundImage: `url("${props.poster}")`, backgroundSize: "contain", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}>
+      <div className="video-idle">
+        <a className="back-button" href={props.demoUrl} target="_blank" rel="noopener noreferrer">
+          Watch {props.title} video
+        </a>
+      </div>
+    </div>;
+  }
   // Remount the player when switching exercises to release the previous resource.
   return <VideoPlayer key={props.src} {...props} />;
 }

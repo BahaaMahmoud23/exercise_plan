@@ -3,7 +3,7 @@ import { WorkoutDayDetails } from "./components/WorkoutDayDetails";
 import { WorkoutOverviewCard } from "./components/WorkoutOverviewCard";
 import { workoutInstructions, workoutPlan, type Exercise } from "./data/workoutPlan";
 
-import { dateKey, dayNumber, weekDates, readSessions, saveSession, type Session } from "./data/tracking";
+import { dateKey, dayNumber, weekDates, readSessions, saveSession, sessionId, type Session } from "./data/tracking";
 import { WorkoutHistory } from "./components/WorkoutTracker";
 
 import { PwaControls } from "./components/PwaControls";
@@ -47,7 +47,7 @@ function App() {
     try { setSessions(saveSession(window.localStorage, session)); setStorageError(""); }
     catch { setStorageError("Could not save workout. Existing saved data is untouched. Check browser storage and try again."); }
   };
-  const completed = (day: typeof workoutPlan[number]) => sessions.some(s => s.id === `upper-lower-v1:${dates[day.day-1]}:${day.slug}` && s.completed);
+  const completed = (day: typeof workoutPlan[number]) => sessions.some(s => s.id === sessionId(day, dates[day.day-1]) && s.completed);
   const calendar = <><PwaControls /><section className="calendar-controls" aria-label="Workout week">
     <button className="back-button" type="button" onClick={() => setView("calories")}>حساب السعرات | Calorie Tracker</button>
     <label>Week containing <input aria-label="Week containing" type="date" value={weekAnchor} onChange={e => { if (/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) setWeekAnchor(e.target.value); }} /></label>
@@ -143,10 +143,10 @@ function App() {
       {calendar}
       <section className="hero-section" aria-labelledby="page-title">
         <div className="hero-copy">
-          <span className="eyebrow">Upper / Lower - 4 Days</span>
+          <span className="eyebrow">4-Day Hybrid Gym + Calisthenics Program</span>
           <h1 id="page-title">A focused 7-day training week built for clean progression.</h1>
           <p>
-            Upper A, Lower A, Rest, Upper B, Lower B, Rest, Rest. Every session includes warm-up guidance,
+            Upper A, Lower + Core, Rest, Upper B, Arms + Calisthenics Skills, Rest, Rest. Every session includes warm-up guidance,
             working-set targets, demo-ready media slots, and form notes.
           </p>
           <div className="hero-actions">
@@ -157,7 +157,7 @@ function App() {
         <div className="hero-panel" aria-label="Weekly training summary">
           <span>Current split</span>
           <strong>4 training days</strong>
-          <p>26 exercise slots across the week with 3 recovery days.</p>
+          <p>{workoutPlan.reduce((total, day) => total + day.exercises.length, 0)} exercise slots across the week with 3 recovery days.</p>
           <div className="mini-week">
             {workoutPlan.map((day) => (
               <button

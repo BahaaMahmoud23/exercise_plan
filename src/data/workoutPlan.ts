@@ -1,6 +1,6 @@
 type MediaSection = "push" | "pull" | "legs" | "upper" | "lower" | "rest";
 
-export type WorkoutSlug = "upper-a" | "lower-a" | "upper-b" | "lower-b" | "rest";
+export type WorkoutSlug = "upper-a" | "lower-core" | "upper-b" | "arms-skills" | "rest";
 
 export type Warmup = {
   title: string;
@@ -19,6 +19,7 @@ export type Exercise = {
   image: string;
   video: string;
   instructions: string[];
+  demoUrl?: string;
   tips: string[];
   mistakes: string[];
   restTime: string;
@@ -81,7 +82,7 @@ const upperBodyWarmup: Warmup = {
   instructions: [
     "Start with 5 minutes of easy cardio to raise body temperature.",
     "Use rotator cuff warm-up drills before pressing or pulling.",
-    "Complete 2 warm-up sets from the first 2 exercises: first at 50%, second at 75-80% of your working weight.",
+    "Before loaded work, warm up at roughly 50% and then 75–80% of your working weight. Use more assistance or an easier variation for bodyweight work.",
     "Keep every warm-up rep smooth and controlled.",
   ],
 };
@@ -92,7 +93,7 @@ const lowerBodyWarmup: Warmup = {
   instructions: [
     "Start with 5 minutes of treadmill walking or cycling.",
     "Add lateral lunges, leg kicks, and hip mobility drills.",
-    "Complete 2 warm-up sets from the first 2 exercises: first at 50%, second at 75-80% of your working weight.",
+    "Before loaded work, warm up at roughly 50% and then 75–80% of your working weight. Use more assistance or an easier variation for bodyweight work.",
     "Move through a full pain-free range before loading heavy.",
   ],
 };
@@ -155,39 +156,107 @@ const exercise = (name: string, slug: string, sets: number, range: string, muscl
   video: addedExerciseVideos[slug] ?? (media ? mediaPath(...media).video : ""),
 });
 
+const youtubeDemo = (id: string) => ({
+  demoUrl: `https://www.youtube.com/watch?v=${id}`,
+  image: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+});
+
+const inclinePushUps = (range: string): Exercise => ({
+  ...exercise("Incline Push-ups", "incline-push-ups", 2, range, "Chest"),
+  ...youtubeDemo("JK0Zn6kNs04"),
+  info: "Use a stable bench or fixed bar to scale the push-up.",
+  instructions: [
+    "Place your hands shoulder-width apart on a stable elevated surface and step back into a straight plank.",
+    "Bend your elbows and lower your chest toward the surface, then press back up.",
+  ],
+  tips: ["Start with a higher surface and lower it as you gain control."],
+  mistakes: ["Letting the hips sag or flaring the elbows straight out."],
+});
+
 const upperA = [
-  exercise("Chest Press", "chest-press", 3, "8–12", "Chest"),
-  exercise("Lat Pulldown", "lat-pulldown", 3, "8–12", "Lats", ["pull", "lat-pulldown"]),
+  exercise("Incline Dumbbell Press", "incline-chest-press", 3, "8–12", "Upper Chest", ["push", "incline-dumbbell-press"]),
+  exercise("Lat Pulldown", "lat-pulldown", 3, "10–12", "Lats", ["pull", "lat-pulldown"]),
+  inclinePushUps("6–10"),
   exercise("Seated Cable Row", "seated-cable-row", 2, "10–12", "Mid Back", ["pull", "wide-grip-seated-row"]),
-  exercise("Shoulder Press", "shoulder-press", 2, "10–12", "Shoulders", ["push", "shoulder-press-machine"]),
-  exercise("Lateral Raise", "lateral-raise", 2, "12–15", "Side Delts", ["push", "seated-dumbbell-lateral-raises"]),
-  exercise("Triceps Pushdown", "triceps-pushdown", 2, "10–15", "Triceps", ["push", "single-arm-triceps-pushdown"]),
-  exercise("Biceps Curl", "biceps-curl", 2, "10–15", "Biceps", ["pull", "seated-dumbbell-curls"]),
+  exercise("Lateral Raises", "lateral-raise", 2, "12–15", "Side Delts", ["push", "seated-dumbbell-lateral-raises"]),
+  exercise("Triceps Pushdown", "triceps-pushdown", 2, "10–12", "Triceps", ["push", "single-arm-triceps-pushdown"]),
 ];
-const lowerA = [
+const lowerCore = [
   exercise("Leg Press", "leg-press", 3, "10–12", "Quads", ["lower", "leg-press"]),
-  exercise("Romanian Deadlift", "romanian-deadlift", 2, "8–10", "Hamstrings"),
-  exercise("Leg Curl", "leg-curl", 3, "10–12", "Hamstrings", ["legs", "lying-or-seated-leg-curls"]),
-  exercise("Leg Extension", "leg-extension", 2, "12–15", "Quads", ["lower", "leg-extension"]),
+  exercise("Romanian Deadlift", "romanian-deadlift", 3, "8–10", "Hamstrings"),
+  exercise("Leg Curl", "leg-curl", 2, "10–12", "Hamstrings", ["legs", "lying-or-seated-leg-curls"]),
   exercise("Calf Raises", "calf-raises", 3, "12–15", "Calves", ["lower", "seated-calf-raises-machine"]),
-  exercise("Plank", "plank", 3, "20–40", "Core", undefined, "seconds"),
+  {
+    ...exercise("Dead Bug", "dead-bug", 3, "10", "Core"),
+    ...youtubeDemo("qhwJ63aibsY"),
+    info: "Alternate sides for 10 total reps per set.",
+    instructions: [
+      "Lie on your back with arms up and hips and knees bent to about 90 degrees.",
+      "Exhale as you reach one arm overhead and extend the opposite leg. Return to the start and switch sides.",
+    ],
+    tips: ["Shorten the reach if your lower back starts to lift."],
+    mistakes: ["Arching the lower back or moving both limbs on the same side."],
+  },
+  exercise("Plank", "plank", 3, "20–30", "Core", undefined, "seconds"),
 ];
 const upperB = [
-  exercise("Incline Chest Press", "incline-chest-press", 3, "8–12", "Upper Chest", ["push", "incline-dumbbell-press"]),
-  exercise("Lat Pulldown (Alternative Grip)", "lat-pulldown-alternative-grip", 3, "10–12", "Lats"),
-  exercise("Chest Supported Row", "chest-supported-row", 2, "10–12", "Mid Back"),
-  exercise("Pec Deck", "pec-deck", 2, "12–15", "Chest", ["push", "butterfly-machine"]),
-  exercise("Reverse Pec Deck", "reverse-pec-deck", 2, "12–15", "Rear Delts", ["pull", "reverse-flyes-machine"]),
+  {
+    ...exercise("Assisted Pull-ups", "assisted-pull-ups", 3, "5–8", "Lats"),
+    ...youtubeDemo("wFj808u2HWU"),
+    info: "Use machine assistance to build toward unassisted pull-ups.",
+    instructions: [
+      "Select enough assistance for controlled reps, grip the handles, and get onto the machine pad as directed.",
+      "Pull your elbows down until your chin approaches bar height, then lower slowly to straight arms.",
+    ],
+    tips: ["Reduce the assistance gradually after reaching 8 clean reps on all three sets."],
+    mistakes: ["Swinging or letting the pad drive the movement."],
+  },
+  exercise("Chest Press Machine", "chest-press", 3, "8–12", "Chest"),
+  exercise("Chest Supported Row", "chest-supported-row", 3, "8–12", "Mid Back"),
+  {
+    ...exercise("Incline Chest Fly", "incline-chest-fly", 2, "12", "Upper Chest"),
+    ...youtubeDemo("iPSsUsShqZs"),
+    instructions: [
+      "Lie on a low-incline bench with dumbbells over your chest and elbows slightly bent.",
+      "Open your arms in an arc to a comfortable stretch, then bring the dumbbells back above your chest.",
+    ],
+  },
+  {
+    ...exercise("Face Pull", "face-pull", 2, "12–15", "Rear Delts"),
+    instructions: [
+      "Set a rope attachment at about eye level and step back until the cable is taut.",
+      "Pull the rope toward your face, separating the ends beside your temples, then return slowly.",
+    ],
+  },
   exercise("Hammer Curl", "hammer-curl", 2, "10–12", "Biceps"),
-  exercise("Overhead Triceps Extension", "overhead-triceps-extension", 2, "10–12", "Triceps"),
 ];
-const lowerB = [
-  exercise("Squat / Hack Squat", "squat-hack-squat", 3, "8–12", "Quads", ["legs", "hack-squats"]),
-  exercise("Hip Thrust", "hip-thrust", 3, "10–12", "Glutes", ["lower", "smith-machine-hip-thrust"]),
-  exercise("Seated Leg Curl", "seated-leg-curl", 3, "10–12", "Hamstrings"),
-  exercise("Leg Extension", "leg-extension", 2, "12–15", "Quads", ["lower", "leg-extension"]),
-  exercise("Calf Raises", "calf-raises", 3, "12–15", "Calves", ["lower", "seated-calf-raises-machine"]),
-  exercise("Cable Crunch", "cable-crunch", 3, "12–15", "Core"),
+const armsSkills = [
+  inclinePushUps("8–12"),
+  {
+    ...exercise("Incline Pike Push-ups", "incline-pike-push-ups", 2, "5–8", "Shoulders"),
+    ...youtubeDemo("Dh5r4KMEKgo"),
+    info: "Keep your hands elevated and your hips high to emphasize the shoulders.",
+    instructions: [
+      "Place your hands on a stable bench and lift your hips into an inverted V, with your feet on the floor.",
+      "Bend your elbows to lower the crown of your head toward the bench, then press back up.",
+    ],
+    tips: ["Use a higher surface or a shorter range to make the movement easier."],
+    mistakes: ["Dropping the hips or leading with the chest."],
+  },
+  exercise("Biceps Curl", "biceps-curl", 3, "10–12", "Biceps", ["pull", "seated-dumbbell-curls"]),
+  exercise("Overhead Triceps Extension", "overhead-triceps-extension", 3, "10–12", "Triceps"),
+  exercise("Lateral Raises", "lateral-raise", 2, "12–15", "Side Delts", ["push", "seated-dumbbell-lateral-raises"]),
+  {
+    ...exercise("Hollow Body Hold", "hollow-body-hold", 3, "15–25", "Core", undefined, "seconds"),
+    ...youtubeDemo("LlDNef_Ztsc"),
+    info: "Hold a braced position while breathing steadily.",
+    instructions: [
+      "Lie on your back, gently press your lower back into the floor, and lift your shoulders.",
+      "Extend your legs and reach overhead only as far as you can maintain floor contact with your lower back.",
+    ],
+    tips: ["Bend your knees or reach forward with your arms to make the hold easier."],
+    mistakes: ["Letting the lower back arch or holding your breath."],
+  },
 ];
 const trainingDay = (day: number, weekday: string, title: string, slug: WorkoutSlug, exercises: Exercise[], upper: boolean): WorkoutDay => ({
   day, weekday, title, slug, exercises,
@@ -203,17 +272,27 @@ const restDay = (day: number, weekday: string, walking = false): WorkoutDay => (
   cardio: walking ? "Optional: 15–20 minutes of walking." : undefined,
 });
 export const workoutPlan: WorkoutDay[] = [
-  trainingDay(1, "Saturday", "Upper A", "upper-a", upperA, true),
-  trainingDay(2, "Sunday", "Lower A", "lower-a", lowerA, false),
+  {
+    ...trainingDay(1, "Saturday", "Upper A", "upper-a", upperA, true),
+    description: "Upper chest and back, with shoulder and triceps work.",
+  },
+  trainingDay(2, "Sunday", "Lower + Core", "lower-core", lowerCore, false),
   restDay(3, "Monday", true),
-  trainingDay(4, "Tuesday", "Upper B", "upper-b", upperB, true),
-  trainingDay(5, "Wednesday", "Lower B", "lower-b", lowerB, false),
+  {
+    ...trainingDay(4, "Tuesday", "Upper B", "upper-b", upperB, true),
+    description: "Chest and back training with assisted pull-up progression.",
+  },
+  {
+    ...trainingDay(5, "Wednesday", "Arms + Calisthenics Skills", "arms-skills", armsSkills, true),
+    description: "Arm training with incline push-ups, pike push-ups, and hollow holds.",
+    targetMuscles: ["Arms", "Shoulders", "Chest", "Core"],
+  },
   restDay(6, "Thursday", true),
   restDay(7, "Friday"),
 ];
 export const workoutInstructions = [
   "Warm up before working sets and keep every repetition controlled.",
   "Keep 1-2 reps in reserve and earn heavier loads with consistent form.",
-  "Log each working set in kilograms; track plank holds in seconds.",
+  "Log weight in kilograms where applicable. Track planks and hollow body holds in seconds.",
   "Walking is optional: 10 minutes after training, and 15–20 minutes on Monday and Thursday.",
 ];

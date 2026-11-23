@@ -17,17 +17,29 @@ try {
    } catch { await route.fulfill({status:404,body:''}); }
  });
  await page.goto('http://127.0.0.1:5173');
- await page.evaluate(() => localStorage.setItem('unrelated-history','keep'));
+ const legacy = {
+   id:'upper-lower-v1:2026-10-24:upper-a', program:'upper-lower-v1',
+   date:'2026-10-24', title:'Upper A', completed:true,
+   exercises:[{slug:'chest-press',name:'Chest Press',unit:'reps',notes:'Legacy note',
+     sets:[{target:'8–12',actual:'11',weight:'30',completed:true}]}],
+ };
+ await page.evaluate(session => localStorage.setItem('bahaa-workouts.upper-lower.v1', JSON.stringify([session])), legacy);
+ await page.reload();
+ const legacyHistory = page.locator('#history details').filter({hasText:'Legacy note'});
+ await legacyHistory.locator('summary').click();
+ assert.match(await legacyHistory.innerText(), /2026-10-24 · Upper A · Completed[\s\S]*11\/8–12 reps × 30 kg ✓/);
  await page.getByLabel('Week containing').fill('2026-10-24');
  const upper = page.locator('.overview-card').filter({has:page.locator('strong',{hasText:'Upper A'})});
+ assert.doesNotMatch(await upper.innerText(), /Completed/);
  await upper.click();
- await page.getByLabel('Chest Press set 1 reps',{exact:true}).fill('12');
- await page.getByLabel('Chest Press set 1 weight kg',{exact:true}).fill('35');
- await page.getByLabel('Chest Press set 1 completed',{exact:true}).check();
+ assert.equal(await page.getByLabel('Incline Dumbbell Press set 1 reps',{exact:true}).inputValue(),'');
+ await page.getByLabel('Incline Dumbbell Press set 1 reps',{exact:true}).fill('12');
+ await page.getByLabel('Incline Dumbbell Press set 1 weight kg',{exact:true}).fill('35');
+ await page.getByLabel('Incline Dumbbell Press set 1 completed',{exact:true}).check();
  await page.reload();
  await page.getByLabel('Week containing').fill('2026-10-24');
  await upper.click();
- await assert.equal(await page.getByLabel('Chest Press set 1 weight kg',{exact:true}).inputValue(),'35');
+ await assert.equal(await page.getByLabel('Incline Dumbbell Press set 1 weight kg',{exact:true}).inputValue(),'35');
  const inputs = page.locator('.exercise-log input[type=number]');
  for (let i=0;i<await inputs.count();i++) await inputs.nth(i).fill(i%2===0?'12':'35');
  for (const checkbox of await page.locator('.exercise-log input[type=checkbox]').all()) await checkbox.check();
@@ -37,11 +49,12 @@ try {
  await page.getByLabel('Week containing').fill('2026-10-31');
  await upper.click();
  assert.match(await page.locator('.exercise-log').first().innerText(),/2026-10-24/);
- assert.equal(await page.getByLabel('Chest Press set 1 reps',{exact:true}).inputValue(),'');
- await page.getByLabel('Chest Press set 1 reps',{exact:true}).fill('10');
+ assert.equal(await page.getByLabel('Incline Dumbbell Press set 1 reps',{exact:true}).inputValue(),'');
+ await page.getByLabel('Incline Dumbbell Press set 1 reps',{exact:true}).fill('10');
  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('bahaa-workouts.upper-lower.v1')));
- assert.equal(stored.length,2);assert.equal(stored.find(s=>s.date==='2026-10-24').completed,true);
- assert.equal(await page.evaluate(()=>localStorage.getItem('unrelated-history')),'keep');
+ assert.equal(stored.length,3);
+ assert.deepEqual(stored.find(s=>s.id===legacy.id),legacy);
+ assert.equal(stored.find(s=>s.id==='hybrid-gym-calisthenics-v1:2026-10-24:upper-a').completed,true);
  await page.getByRole('button',{name:'Back to plan',exact:true}).click();
  await page.locator('.overview-card').nth(2).click();
  assert.match(await page.locator('.rest-panel').innerText(),/15–20/);
